@@ -18,7 +18,7 @@ public class FrameReader
         {
             while (true)
             {
-                if (TryToReadFrame()) break;
+                if (!TryToReadFrame()) break;
 
                 int fps = 1000 / SetUpConfig.FrameRate;
                 Thread.Sleep(fps);
