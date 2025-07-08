@@ -10,7 +10,6 @@ partial class SumatoVisionView
     private Button cameraBtn;
     private Button stopBtn;
 
-
     protected override void Dispose(bool disposing)
     {
         if (disposing && (components != null))
@@ -41,7 +40,6 @@ partial class SumatoVisionView
         // startBtn
         // 
         startBtn.Dock = DockStyle.Bottom;
-        startBtn.Enabled = false;
         startBtn.Location = new Point(0, 455);
         startBtn.Name = "startBtn";
         startBtn.Size = new Size(640, 25);
@@ -49,6 +47,7 @@ partial class SumatoVisionView
         startBtn.Text = "Start";
         startBtn.UseVisualStyleBackColor = true;
         startBtn.Click += startBtn_Click;
+        startBtn.Visible = false;
         // 
         // fileVideoBtn
         // 

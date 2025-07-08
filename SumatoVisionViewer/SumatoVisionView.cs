@@ -4,97 +4,74 @@ using SumatoVisionCore;
 namespace SumatoVisionViewer;
 public partial class SumatoVisionView : Form
 {
-    private FrameQueue _queue;
-    private FrameReader _reader;
-    private Thread _displayThread;
-    private bool _running = false;
+
+    private SumatoVisionController _controller;
 
     public SumatoVisionView()
     {
+        _controller = new SumatoVisionController(DisplayFrames);
         InitializeComponent();
-        InitSumatoVisualCore();
-    }
-
-    private void InitSumatoVisualCore()
-    {
-        _queue = new FrameQueue();
     }
 
     private void fileVideoBtn_Click(object sender, EventArgs e)
     {
-        startBtn.Enabled = true;
-
         var dialog = new OpenFileDialog();
+        _controller.FileVideoBtn_Click(dialog.FileName);
 
-        if (dialog.ShowDialog() == DialogResult.OK)
-        {
-            if (_reader != null) return;
-            _reader = new FrameReader(_queue, new FileFrameSource(dialog.FileName));
-        }
+        startBtn.Visible = true;
+        SetVisbleCameraAndFileVideoBtns(false);
     }
+
     private void cameraBtn_Click(object sender, EventArgs e)
     {
-        startBtn.Enabled = true;
+        _controller.CameraBtn_Click();
 
-        if (_reader != null) return;
-        _reader = new FrameReader(_queue, new CameraFrameSoruce(0));
+        startBtn.Visible = true;
+        SetVisbleCameraAndFileVideoBtns(false);
     }
 
     private void stopBtn_Click(object sender, EventArgs e)
     {
-        _running = false;
+        _controller.StopBtn_Click();
 
         stopBtn.Visible = false;
-        startBtn.Visible = true;
-        cameraBtn.Visible = true;
-        fileVideoBtn.Visible = true;
+        SetVisbleCameraAndFileVideoBtns(true);
     }
 
 
     private void startBtn_Click(object sender, EventArgs e)
     {
-        _reader.Start();
-        StartStreaming();
-
-        startBtn.Enabled = false;
-        stopBtn.Visible = true;
+        _controller.StartBtn_Click();
+        
         startBtn.Visible = false;
-        cameraBtn.Visible = false;
-        fileVideoBtn.Visible = false;
+        stopBtn.Visible = true;
     }
 
-    private void StartStreaming()
+    private void DisplayFrames(IFrame frame)
     {
-        _running = true;
-        if (_displayThread != null && _displayThread.IsAlive) return;
+        var resized = frame.Resize(SetUpConfig.ResizeWidth, SetUpConfig.ResizeHeight);
 
-        _displayThread = new Thread(DisplayFrames);
-        _displayThread.Start();
-    }
-
-    private void DisplayFrames()
-    {
-        while (_running)
+        if (resized is MatFrame matFrame)
         {
-            var frame = _queue.PullQueue();
-            var resized = frame.Resize(SetUpConfig.ResizeWidth, SetUpConfig.ResizeHeight);
-
-            if (resized is MatFrame matFrame)
+            var bmp = BitmapConverter.ToBitmap(matFrame.RawMat);
+            pictureBox.Invoke(() =>
             {
-                var bmp = BitmapConverter.ToBitmap(matFrame.RawMat);
-                pictureBox.Invoke(() =>
-                {
-                    pictureBox.Image?.Dispose();
-                    pictureBox.Image = bmp;
-                });
-            }
+                pictureBox.Image?.Dispose();
+                pictureBox.Image = bmp;
+            });
         }
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
-        _running = false;
         base.OnFormClosing(e);
     }
+
+    private void SetVisbleCameraAndFileVideoBtns(bool isVisible)
+    {
+        cameraBtn.Visible = isVisible;
+        fileVideoBtn.Visible = isVisible;
+    }
+
 
 }
