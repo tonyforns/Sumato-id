@@ -1,9 +1,9 @@
 using SumatoVisionCore;
 
-public class FrameReader
+public class FrameReader : ThreadHandler
 {
     private readonly FrameQueue _queue;
-    private readonly IFrameSource _capture;
+    private IFrameSource _capture;
  
     public FrameReader(FrameQueue queue, IFrameSource frameSource)
     {
@@ -11,18 +11,17 @@ public class FrameReader
         _capture = frameSource;
     }
 
-    public void Start()
+    public void SetFrameSource(IFrameSource frameSource)
     {
-        new Thread(() =>
-        {
-            while (true)
-            {
-                if (!TryToReadFrame()) break;
+        _capture = frameSource;
+    }
 
-                int fps = 1000 / SetUpConfig.FrameRate;
-                Thread.Sleep(fps);
-            }
-        }).Start();
+    internal override void ThreadFunction()
+    {
+        if (!TryToReadFrame()) return;
+
+        int fps = 1000 / SetUpConfig.FrameRate;
+        Thread.Sleep(fps);
     }
 
     private bool TryToReadFrame()

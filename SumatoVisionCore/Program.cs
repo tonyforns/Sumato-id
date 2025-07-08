@@ -12,7 +12,7 @@ class Program
 
        // string path = $@"C:\Programing\Sumato-id\Video.mp4";
 
-        FrameProcessor processor = new FrameProcessor(queue);
+        FrameProcessor processor = new FrameProcessor(queue, null);
 
         reader.Start();
         processor.Start();
