@@ -12,7 +12,7 @@ namespace SumatoId
 
         public bool Read(out IFrame frame)
         {
-            using Mat mat = new Mat();
+            Mat mat = new Mat();
             if (!_capture.Read(mat) || mat.Empty())
             {
                 frame = new MatFrame(null);
