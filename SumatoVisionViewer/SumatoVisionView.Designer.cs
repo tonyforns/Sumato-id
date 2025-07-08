@@ -97,7 +97,4 @@ partial class SumatoVisionView
         ((System.ComponentModel.ISupportInitialize)pictureBox).EndInit();
         ResumeLayout(false);
     }
-
-
-
 }
