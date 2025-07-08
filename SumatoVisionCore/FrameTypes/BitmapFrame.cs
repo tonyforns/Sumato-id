@@ -1,8 +1,7 @@
 ﻿using System.Drawing;
 using System.Numerics;
 
-namespace SumatoId;
-
+namespace SumatoVisionCore;
 public class BitmapFrame : IFrame
 {
     public Bitmap RawBitmap { get; private set; }

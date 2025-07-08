@@ -1,7 +1,7 @@
 using OpenCvSharp;
 using System.Numerics;
 
-namespace SumatoId;
+namespace SumatoVisionCore;
 public class MatFrame : IFrame
 {
     public Mat RawMat { get; private set; }

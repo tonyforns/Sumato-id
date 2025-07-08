@@ -1,5 +1,4 @@
-using OpenCvSharp;
-using SumatoId;
+using SumatoVisionCore;
 
 public class FrameReader
 {

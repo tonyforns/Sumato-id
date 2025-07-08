@@ -1,7 +1,6 @@
-
 using System.Collections.Concurrent;
 
-namespace SumatoId;
+namespace SumatoVisionCore;
 
 public class FrameQueue
 {

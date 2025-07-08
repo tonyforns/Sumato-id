@@ -1,6 +1,4 @@
-﻿using OpenCvSharp;
-
-namespace SumatoId;
+﻿namespace SumatoVisionCore;
 public class FrameProcessor
 {
     private readonly FrameQueue _queue;
