@@ -1,9 +1,10 @@
 ﻿namespace SumatoVisionCore
 {
-    public abstract class ThreadHandler
+    public abstract class ThreadHandler : IDisposable
     {
         private Thread _thread;
         private ManualResetEventSlim _pauseEvent = new ManualResetEventSlim(true);
+        private bool _shouldStop = false;
         public bool IsRunning { get; private set; } = false;
 
         public void Start()
@@ -13,18 +14,23 @@
 
             _thread = new Thread(() =>
             {
-                while (true)
+                while (!_shouldStop)
                 {
                     _pauseEvent.Wait();
 
+                    if (_shouldStop) break;
+
                     ThreadFunction();
                 }
+                OnStopped();
             });
 
             _thread.Start();
         }
 
         internal abstract void ThreadFunction();
+
+        internal virtual void OnStopped() { }
 
         public void Pause()
         {
@@ -34,6 +40,21 @@
         public void Resume()
         {
             _pauseEvent.Set();
+        }
+
+        private void Stop()
+        {
+            if (!IsRunning) return;
+
+            _shouldStop = true;
+            _pauseEvent.Set();
+            _thread?.Join(1000);
+            IsRunning = false;
+        }
+        public void Dispose()
+        {
+            Stop();
+            _pauseEvent.Dispose();
         }
     }
 }

@@ -19,4 +19,10 @@ public class FrameProcessor : ThreadHandler
         IFrame frame = _queue.PullQueue();
         _processFrameAction?.Invoke(frame);
     }
+
+    internal override void OnStopped()
+    {
+        _processFrameAction = null;
+        base.OnStopped();
+    }
 }
