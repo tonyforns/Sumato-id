@@ -12,7 +12,11 @@ public class FrameProcessor : ThreadHandler
 
     internal override void ThreadFunction()
     {
-        IFrame frame = _queue.PullQueue().Resize(SetUpConfig.ResizeWidth, SetUpConfig.ResizeHeight);
+        if (_queue.Count == 0)
+        {
+            return;
+        }
+        IFrame frame = _queue.PullQueue();
         _processFrameAction?.Invoke(frame);
     }
 }
