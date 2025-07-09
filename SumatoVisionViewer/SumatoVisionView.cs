@@ -1,5 +1,6 @@
 using OpenCvSharp.Extensions;
 using SumatoVisionCore;
+using SumatoVisionViewer.Properties;
 
 namespace SumatoVisionViewer;
 public partial class SumatoVisionView : Form
@@ -34,6 +35,7 @@ public partial class SumatoVisionView : Form
     {
         _controller.StopBtn_Click();
 
+        pictureBox.Image = Resources.logo;
         stopBtn.Visible = false;
         SetVisbleCameraAndFileVideoBtns(true);
     }

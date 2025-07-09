@@ -1,4 +1,5 @@
 using SumatoVisionCore;
+using SumatoVisionViewer.Properties;
 
 namespace SumatoVisionViewer;
 partial class SumatoVisionView
@@ -39,6 +40,7 @@ partial class SumatoVisionView
         // 
         // startBtn
         // 
+        pictureBox.Image = Resources.logo;
         startBtn.Dock = DockStyle.Bottom;
         startBtn.Location = new Point(0, 455);
         startBtn.Name = "startBtn";
