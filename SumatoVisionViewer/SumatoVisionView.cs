@@ -4,7 +4,6 @@ using SumatoVisionCore;
 namespace SumatoVisionViewer;
 public partial class SumatoVisionView : Form
 {
-
     private SumatoVisionController _controller;
 
     public SumatoVisionView()
@@ -57,6 +56,7 @@ public partial class SumatoVisionView : Form
             var bmp = BitmapConverter.ToBitmap(matFrame.RawMat);
             pictureBox.Invoke(() =>
             {
+                matFrame.RawMat.Dispose();
                 pictureBox.Image?.Dispose();
                 pictureBox.Image = bmp;
             });
@@ -73,6 +73,4 @@ public partial class SumatoVisionView : Form
         cameraBtn.Visible = isVisible;
         fileVideoBtn.Visible = isVisible;
     }
-
-
 }
