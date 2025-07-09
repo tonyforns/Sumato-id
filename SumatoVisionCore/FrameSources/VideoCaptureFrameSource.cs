@@ -3,7 +3,7 @@
 namespace SumatoVisionCore;
 public abstract class VideoCaptureFrameSource : IFrameSource
 {
-    internal readonly VideoCapture _capture;
+    internal VideoCapture _capture;
     public VideoCaptureFrameSource(VideoCapture capture)
     {
         _capture = capture;
@@ -12,13 +12,17 @@ public abstract class VideoCaptureFrameSource : IFrameSource
     public bool Read(out IFrame frame)
     {
         Mat mat = new Mat();
-        if (!_capture.Read(mat) || mat.Empty())
+        bool success = _capture.Read(mat);
+        if (!success || mat.Empty())
         {
-            frame = new MatFrame(null);
+            Reconnect();
+            frame = null;
             return false;
         }
-
         frame = new MatFrame(mat);
-        return true;
+        return success;
     }
+
+    internal abstract bool Reconnect();
+
 }
