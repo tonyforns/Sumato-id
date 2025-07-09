@@ -3,6 +3,7 @@
     public abstract class ThreadHandler : IDisposable
     {
         private Thread _thread;
+        protected IThreadTask _threadTask;
         private ManualResetEventSlim _pauseEvent = new ManualResetEventSlim(true);
         private bool _shouldStop = false;
         public bool IsRunning { get; private set; } = false;
@@ -20,17 +21,13 @@
 
                     if (_shouldStop) break;
 
-                    ThreadFunction();
+                    _threadTask.Task();
                 }
-                OnStopped();
+                _threadTask.OnStopped();
             });
 
             _thread.Start();
         }
-
-        internal abstract void ThreadFunction();
-
-        internal virtual void OnStopped() { }
 
         public void Pause()
         {
