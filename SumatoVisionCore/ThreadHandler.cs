@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace SumatoVisionCore
+﻿namespace SumatoVisionCore
 {
     public abstract class ThreadHandler
     {
