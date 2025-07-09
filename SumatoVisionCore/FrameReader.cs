@@ -18,20 +18,19 @@ public class FrameReader : ThreadHandler
 
     internal override void ThreadFunction()
     {
-        if (!TryToReadFrame()) return;
+        if (TryToReadFrame(out IFrame frame))
+            _queue.PushQueue(frame);
 
         int fps = 1000 / SetUpConfig.FrameRate;
         Thread.Sleep(fps);
     }
 
-    private bool TryToReadFrame()
+    private bool TryToReadFrame(out IFrame frame)
     {
-        if (!_capture.Read(out IFrame frame) || frame.IsEmpty)
+        if (!_capture.Read(out frame))
         {
-            Console.WriteLine("Can't read frame or frame is Empty");
             return false;
         }
-        _queue.PushQueue(frame);
         return true;
     }
 }
