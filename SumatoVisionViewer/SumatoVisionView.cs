@@ -16,7 +16,8 @@ public partial class SumatoVisionView : Form
     private void fileVideoBtn_Click(object sender, EventArgs e)
     {
         var dialog = new OpenFileDialog();
-        _controller.FileVideoBtn_Click(dialog.FileName);
+        if (dialog.ShowDialog() == DialogResult.OK)
+            _controller.FileVideoBtn_Click(dialog.FileName);
 
         startBtn.Visible = true;
         SetVisbleCameraAndFileVideoBtns(false);
