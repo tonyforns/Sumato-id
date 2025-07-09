@@ -91,7 +91,7 @@ partial class SumatoVisionView
         Controls.Add(fileVideoBtn);
         Controls.Add(pictureBox);
         Controls.Add(startBtn);
-        Name = "Form1";
+        Name = "SumatoVisionView";
         Text = "Video Viewer";
         ((System.ComponentModel.ISupportInitialize)pictureBox).EndInit();
         ResumeLayout(false);

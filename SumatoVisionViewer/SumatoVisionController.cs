@@ -1,5 +1,4 @@
 ﻿using SumatoVisionCore;
-using System.IO;
 
 namespace SumatoVisionViewer
 {
