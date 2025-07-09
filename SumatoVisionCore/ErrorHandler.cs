@@ -7,5 +7,5 @@ public static class ErrorHandler
        public static void LogError(string message)
        {
            OnError?.Invoke(message);
-    }
+       }
 }
