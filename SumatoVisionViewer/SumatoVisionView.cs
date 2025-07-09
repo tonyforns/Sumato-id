@@ -54,17 +54,29 @@ public partial class SumatoVisionView : Form
         if (resized is MatFrame matFrame)
         {
             var bmp = BitmapConverter.ToBitmap(matFrame.RawMat);
-            pictureBox.Invoke(() =>
+            if (pictureBox != null && pictureBox.IsHandleCreated)
             {
-                matFrame.RawMat.Dispose();
-                pictureBox.Image?.Dispose();
-                pictureBox.Image = bmp;
-            });
+                try
+                {
+                    pictureBox.Invoke(() =>
+                    {
+                        matFrame.RawMat?.Dispose();
+                        pictureBox.Image?.Dispose();
+                        pictureBox.Image = bmp;
+                    });
+                }
+                catch (Exception e)
+                {
+                }
+         
+            }
+      
         }
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
+        _controller.Dispose();
         base.OnFormClosing(e);
     }
 
