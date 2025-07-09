@@ -2,7 +2,7 @@
 
 namespace SumatoVisionViewer
 {
-    public class SumatoVisionController
+    public class SumatoVisionController : IDisposable   
     {
         private FrameQueue _queue;
         private FrameReader _reader;
@@ -54,6 +54,13 @@ namespace SumatoVisionViewer
         {
             _reader.Pause();
             _processor.Pause();
+        }
+
+        public void Dispose()
+        {
+            _processor.Dispose();
+            _reader.Dispose();
+            _queue.Dispose();
         }
     }
 }
