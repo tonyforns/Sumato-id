@@ -12,4 +12,10 @@
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.11.0.20250507" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="SumatoVisionCore">
+      <HintPath>..\..\SumatoVisionCore\bin\Debug\net8.0\SumatoVisionCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
