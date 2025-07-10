@@ -24,7 +24,7 @@ class Program
             MatFrame matFrame = new MatFrame(mat);
             matFrame.Resize(640, 480);
 
-            Console.WriteLine($"Received frame: {matFrame}  {matFrame.Size.X}x{matFrame.Size.Y}");
+            Console.WriteLine($"Received frame: {matFrame.Frame}  {matFrame.Size.X}x{matFrame.Size.Y}");
         }
     }
 }
