@@ -1,6 +1,6 @@
-using System.Drawing;
 using System.Net.WebSockets;
-
+using OpenCvSharp;
+using SumatoVisionCore;
 class Program
 {
     static async Task Main()
@@ -15,11 +15,16 @@ class Program
             var result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             var frameData = buffer[..result.Count];
 
-            using var ms = new MemoryStream(frameData);
-            var bmp = new Bitmap(ms);
-            var resized = new Bitmap(bmp, new Size(640, 480));
+            using Mat mat = Cv2.ImDecode(frameData, ImreadModes.Color);
+            if (mat.Empty())
+            {
+                Console.WriteLine("Error: Empty or invalid Image.");
+                continue;
+            }
+            MatFrame matFrame = new MatFrame(mat);
+            matFrame.Resize(640, 480);
 
-            Console.WriteLine($"Frame recibido: {resized.Width}x{resized.Height}");
+            Console.WriteLine($"Received frame: {matFrame}  {matFrame.Size.X}x{matFrame.Size.Y}");
         }
     }
 }
