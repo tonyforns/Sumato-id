@@ -1,102 +1,140 @@
-# SumatoVisionCore
+# Sumato-id - Evaluación Técnica Backend (Dificultad Media)
 
-**SumatoVisionCore** es una librería en C# orientada al procesamiento de video en tiempo real utilizando OpenCvSharp. Esta librería permite capturar frames desde cámaras, procesarlos con múltiples hilos y realizar operaciones comunes en visión por computadora.
+Este proyecto implementa los 3 desafíos propuestos en la evaluación técnica para Sumato-Id, utilizando .NET 8, OpenCVSharp, multithreading y arquitectura de servicios. Está dividido en módulos reutilizables que permiten trabajar con diferentes fuentes de video y realizar procesamiento distribuido de frames.
 
-## 🚀 Funcionalidades principales
+## 🧩 Tecnologías utilizadas
 
-- Captura de video en tiempo real desde cámara o archivo.
-- Procesamiento asíncrono y concurrente de frames.
-- Estructura extensible para aplicar lógica personalizada de procesamiento de imágenes.
-- Gestión segura de hilos y recursos (`IDisposable`, `BlockingCollection`, etc.).
-- Preparado para integrarse fácilmente con interfaces gráficas (WinForms, WPF).
-
-## 🧱 Estructura de clases
-
-- `CameraFrameSource`: captura frames desde la cámara usando `OpenCvSharp.VideoCapture`.
-- `FrameReader`: lee frames de un stream de video y los envía a una cola.
-- `FrameQueue`: implementa una cola segura para compartir frames entre hilos.
-- `FrameProcessor`: procesa frames en un hilo dedicado usando una acción personalizada.
-- `MatFrame`: adaptación de `Mat` para implementar `IFrame`.
-- `IFrame`: interfaz que permite tratar distintos tipos de frames de forma polimórfica.
-
-## 🖼️ Ejemplo de uso básico
-
-```csharp
-var queue = new FrameQueue();
-var reader = new FrameReader(queue, "");
-var processor = new FrameProcessor(queue, frame =>
-{
-    // Procesamiento de cada frame
-    Console.WriteLine($"Frame recibido con tamaño: {frame.RawMat.Width}x{frame.RawMat.Height}");
-});
-
-reader.Start();
-processor.Start();
-```
-
-## 🧵 Hilos y control de flujo
-
-- `FrameReader` y `FrameProcessor` corren en hilos separados para evitar bloquear el hilo principal.
-- Se utiliza `BlockingCollection` para la comunicación entre hilos (productor-consumidor).
-- Puedes detener y reanudar el procesamiento agregando métodos `Pause` y `Resume` en `FrameProcessor`.
-
-## 💡 Requisitos
-
-- [.NET 6.0 o superior](https://dotnet.microsoft.com/)
-- [OpenCvSharp4](https://www.nuget.org/packages/OpenCvSharp4.Windows/)
-- WinForms (si se usa en una app con GUI)
-
-Instalación de paquetes con NuGet:
-
-```bash
-dotnet add package OpenCvSharp4.Windows
-```
-
-## 🧪 Ejecución
-
-Puedes compilar este proyecto como librería o incluirlo dentro de una aplicación WinForms o consola.
-
-Ejemplo de ejecución en consola (con cámara por defecto):
-```bash
-dotnet run --project SumatoVisionCore.ConsoleApp
-```
-
-## 📦 Integración con UI
-
-- Puede integrarse con un `PictureBox` en WinForms para mostrar los frames en tiempo real.
-- Incluye manejos para evitar excepciones al acceder a controles desde hilos no-UI (`Invoke`, `IsHandleCreated`).
-
-## 🔧 Próximas mejoras
-
-- Soporte para múltiples cámaras simultáneamente.
-- Detección de reconexión automática si se pierde el feed de la cámara.
-- Aplicación de filtros o redes de IA para análisis en tiempo real.
-- Agregar logging estructurado.
-
-
-# SumatoVisionViewer
-
-**SumatoVisionViewer** es una aplicación en C# (WinForms/WPF) diseñada para mostrar en tiempo real los resultados procesados por **SumatoVisionCore**. Permite visualizar video desde cámaras o archivos.
+- .NET 8
+- C#
+- OpenCvSharp
+- WinForms
+- Threads y ConcurrentQueue
+- WebSockets
+- RabbitMQ (para la comunicación entre servicios - No implementado)
+- Design Patterns (Factory, Strategy, Command, Delegate)
 
 ---
 
-## 🎯 Objetivos principales
+## Desafío 1 - App Console
 
-- Visualización fluida de video en tiempo real.
-- Interfaz intuitiva con controles para iniciar, pausar y detener la reproducción.
-- Conexión directa con pipelines de procesamiento (SumatoVisionCore).
+### ✅ Objetivo
+Conectarse a una webcam o video local desde una aplicación de consola y procesar los frames utilizando múltiples hilos.
+
+### 🧪 Funcionalidades implementadas
+
+- Conexión a webcam o archivo de video (usando `VideoCapture` de OpenCVSharp).
+- Redimensionamiento de cada frame a 640x480.
+- Almacenamiento de los frames en una `BlockingCollection<IFrame>` (Queue thread-safe).
+- Procesamiento de frames con diseño desacoplado usando interfaces.
+- Separación de lógica: cada componente implementado con responsabilidades claras.
+
+### 🧵 Threads
+
+- `Main`: Inicializa y gestiona el ciclo de vida de los componentes.
+- `ReaderThread`: Extrae frames y los introduce en la cola (`PushQueue`).
+- `ProcessorThread`: Consume los frames desde la cola y aplica el procesamiento (`PullQueue`).
+
+### 📁 Clases Clave
+
+- `IFrame`: Interfaz base para distintos tipos de frame (por ejemplo, `MatFrame`, `BitmapFrame`).
+- `FrameQueue`: Implementación de la cola thread-safe.
+- `FrameReader`: Lee desde cámara o archivo y hace push de frames.
+- `FrameProcessor`: Consume frames de la cola y aplica redimensionamiento.
 
 ---
 
-## 🚦 Requisitos
+## Desafío 2 - Windows Forms
 
-- [.NET 6.0 o superior](https://dotnet.microsoft.com/)
-- [OpenCvSharp4](https://www.nuget.org/packages/OpenCvSharp4.Windows/)
-- (Opcional) [SumatoVisionCore](../SumatoVisionCore): para integrar la captura y procesamiento de frames
+### ✅ Objetivo
+Visualizar los frames procesados en una interfaz WinForms utilizando el proyecto del Desafío 1 como base.
 
-Instalación:
+### 🔧 Funcionalidades
 
-```bash
-dotnet add package OpenCvSharp4.Windows
+- Selección entre cámara o archivo de video.
+- Visualización de video redimensionado.
+- Interfaz WinForms que consume la DLL compartida de `SumatoVisionCore`.
+- Actualización segura del `PictureBox` mediante `Invoke`.
+
+---
+
+## Desafío 3 - Arquitectura distribuida
+
+### ✅ Objetivo
+Separar la lógica en 3 servicios: `Capture`, `Queue`, `Processing`, permitiendo escalabilidad horizontal.
+
+### 🧱 Arquitectura implementada 
+
+```
+[Service Capture] ---> [Service Queue] ---> [Service Processing]
+       (WS)                  (Queue)                 (WS)
 ```
 
+- **Service Capture**: Lee los frames desde webcam/video y los envía vía WebSocket.
+- **Service Queue**: Recibe frames desde `Capture` y los redistribuye a `Processing`.
+- **Service Processing**: Consume los frames y aplica redimensionamiento.
+
+> Comunicación entre servicios implementada usando **WebSockets** (para simplicidad local) y **RabbitMQ** como propuesta para ambientes distribuidos.
+> Tambien se puede implementar para que Service Processing pueda enviarle mensajes a Service Capture gracias a la flexibilidad de WS
+
+### 💡 Recomendación Técnica
+
+Para ambientes distribuidos, se recomienda usar **RabbitMQ** por las siguientes razones:
+
+- Permite comunicación asíncrona y desacoplada.
+- Tolerancia a fallos y balanceo de carga.
+- Fácil de escalar y monitorizar.
+- Amplio soporte en .NET y otras plataformas.
+
+---
+
+## 🔨 Instrucciones de ejecución
+
+### Requisitos
+
+- .NET 8 SDK
+- OpenCvSharp4.Windows
+- RabbitMQ (opcional para pruebas distribuidas)
+
+### Ejecución (Modo Local)
+
+1. Clonar el repositorio:
+   ```bash
+   git clone https://github.com/tonyforns/Sumato-id.git
+   cd Sumato-id
+   ```
+
+2.1 Ejecutar consola camera:
+   ```bash
+   cd Challange 1
+   dotnet run
+   ```
+
+2.2 Ejecutar consola video file:
+   ```bash
+   cd Challange 1
+   dotnet run {VideoPath}
+   ```
+
+3. Ejecutar WinForms:
+   ```bash
+   cd SumatoVisionViewer
+   dotnet run
+   ```
+
+4. Ejecutar servicios distribuidos (opcional):
+   Ejecutar los proyectos `QueueService`, `CaptureService`,  y `ProcessingService` en ventanas separadas .
+
+---
+
+## 🧠 Diseño Extensible
+
+- Uso de interfaces (`IFrame`) para soportar nuevos tipos de frame.
+- Uso de interfaces(`IFrameSource`) para soportar nuevos tipos frame producer.
+- Diseño desacoplado y basado en componentes.
+- Preparado para integración con herramientas de análisis de video.
+
+---
+
+## 📫 Contacto
+
+Desarrollado por [Antonio Forns] (https://github.com/tonyforns)  
