@@ -34,7 +34,7 @@ app.Use(async (context, next) =>
                         break;
 
                     var frameData = buffer[..result.Count];
-                    frameQueue.Enqueue(frameData);
+                    //frameQueue.Enqueue(frameData);
 
                     foreach (var client in processingClients.ToList())
                     {
@@ -50,7 +50,7 @@ app.Use(async (context, next) =>
                 processingClients.Add(webSocket);
                 while (webSocket.State == WebSocketState.Open)
                 {
-                    await Task.Delay(100); // mantener conexión abierta
+                    await Task.Delay(100);
                 }
                 processingClients.Remove(webSocket);
             }
