@@ -18,10 +18,10 @@ namespace SumatoVisionViewer
         {
             if(_reader != null)
             {
-                _reader.SetFrameSource(new FileFrameSource(path));
+                _reader.SetFrameSource(new FileFrameSource(path), SetUpConfig.frameDelayMs);
             } else
             {
-                _reader = new FrameReader(_queue, new FileFrameSource(path));
+                _reader = new FrameReader(_queue, new FileFrameSource(path), SetUpConfig.frameDelayMs);
             }
         }
 
