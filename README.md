@@ -2,6 +2,8 @@
 
 Este proyecto implementa los 3 desafíos propuestos en la evaluación técnica para Sumato-Id, utilizando .NET 8, OpenCVSharp, multithreading y arquitectura de servicios. Está dividido en módulos reutilizables que permiten trabajar con diferentes fuentes de video y realizar procesamiento distribuido de frames.
 
+---
+
 ## 🧩 Tecnologías utilizadas
 
 - .NET 8
@@ -10,92 +12,92 @@ Este proyecto implementa los 3 desafíos propuestos en la evaluación técnica p
 - WinForms
 - Threads y ConcurrentQueue
 - WebSockets
-- RabbitMQ (para la comunicación entre servicios - No implementado)
-- Design Patterns (Factory, Strategy, Command, Delegate)
+- RabbitMQ *(propuesto, no implementado)*
+- Design Patterns: Factory, Strategy, Command, Delegate
 
 ---
 
-## Desafío 1 - App Console
+## 🚀 Desafío 1 - App Console
 
 ### ✅ Objetivo
+
 Conectarse a una webcam o video local desde una aplicación de consola y procesar los frames utilizando múltiples hilos.
 
 ### 🧪 Funcionalidades implementadas
 
 - Conexión a webcam o archivo de video (usando `VideoCapture` de OpenCVSharp).
 - Redimensionamiento de cada frame a 640x480.
-- Almacenamiento de los frames en una `BlockingCollection<IFrame>` (Queue thread-safe).
-- Procesamiento de frames con diseño desacoplado usando interfaces.
-- Separación de lógica: cada componente implementado con responsabilidades claras.
+- Almacenamiento de los frames en una `BlockingCollection<IFrame>` (cola thread-safe).
+- Procesamiento desacoplado usando interfaces y patrones de diseño.
 
-### 🧵 Threads
+### 🧵 Hilos utilizados
 
-- `Main`: Inicializa y gestiona el ciclo de vida de los componentes.
-- `ReaderThread`: Extrae frames y los introduce en la cola (`PushQueue`).
-- `ProcessorThread`: Consume los frames desde la cola y aplica el procesamiento (`PullQueue`).
+- `Main`: inicializa y gestiona el ciclo de vida.
+- `ReaderThread`: lee frames (`PushQueue`).
+- `ProcessorThread`: consume y procesa (`PullQueue`).
 
-### 📁 Clases Clave
+### 📁 Clases clave
 
-- `IFrame`: Interfaz base para distintos tipos de frame (por ejemplo, `MatFrame`, `BitmapFrame`).
-- `FrameQueue`: Implementación de la cola thread-safe.
-- `FrameReader`: Lee desde cámara o archivo y hace push de frames.
-- `FrameProcessor`: Consume frames de la cola y aplica redimensionamiento.
+- `IFrame`: interfaz base para `MatFrame`, `BitmapFrame`, etc.
+- `FrameQueue`: implementación thread-safe de la cola.
+- `FrameReader`: captura desde cámara o video.
+- `FrameProcessor`: procesa los frames (resize, etc).
 
 ---
 
-## Desafío 2 - Windows Forms
+## 🖼️ Desafío 2 - Windows Forms
 
 ### ✅ Objetivo
+
 Visualizar los frames procesados en una interfaz WinForms utilizando el proyecto del Desafío 1 como base.
 
 ### 🔧 Funcionalidades
 
-- Selección entre cámara o archivo de video.
-- Visualización de video redimensionado.
-- Interfaz WinForms que consume la DLL compartida de `SumatoVisionCore`.
-- Actualización segura del `PictureBox` mediante `Invoke`.
+- Selección entre cámara o archivo.
+- Visualización en `PictureBox` con redimensionamiento.
+- Uso del core como DLL reutilizable (`SumatoVisionCore`).
+- Actualización de UI segura con `Invoke`.
 
 ---
 
-## Desafío 3 - Arquitectura distribuida
+## 🧱 Desafío 3 - Arquitectura distribuida
 
 ### ✅ Objetivo
-Separar la lógica en 3 servicios: `Capture`, `Queue`, `Processing`, permitiendo escalabilidad horizontal.
 
-### 🧱 Arquitectura implementada 
+Separar la lógica en 3 servicios: `Capture`, `Queue`, `Processing`, permitiendo escalabilidad horizontal.
 
 ```
 [Service Capture] ---> [Service Queue] ---> [Service Processing]
        (WS)                  (Queue)                 (WS)
 ```
 
-- **Service Capture**: Lee los frames desde webcam/video y los envía vía WebSocket.
-- **Service Queue**: Recibe frames desde `Capture` y los redistribuye a `Processing`.
-- **Service Processing**: Consume los frames y aplica redimensionamiento.
+- **Capture**: captura y envía frames por WebSocket.
+- **Queue**: recibe y redistribuye a los clientes `Processing`.
+- **Processing**: recibe, convierte y procesa los frames.
 
-> Comunicación entre servicios implementada usando **WebSockets** (para simplicidad local) y **RabbitMQ** como propuesta para ambientes distribuidos.
-> Tambien se puede implementar para que Service Processing pueda enviarle mensajes a Service Capture gracias a la flexibilidad de WS
+> Implementación actual con WebSockets. Se propone RabbitMQ para ambientes reales distribuidos. También se podría usar WebSocket bidireccional para mensajes de retorno (`Processing → Capture`).
 
-### 💡 Recomendación Técnica
+---
 
-Para ambientes distribuidos, se recomienda usar **RabbitMQ** por las siguientes razones:
+## 💡 Recomendación Técnica
 
-- Permite comunicación asíncrona y desacoplada.
-- Tolerancia a fallos y balanceo de carga.
-- Fácil de escalar y monitorizar.
-- Amplio soporte en .NET y otras plataformas.
+Usar RabbitMQ en producción:
+
+- Comunicación desacoplada y asíncrona.
+- Escalabilidad y tolerancia a fallos.
+- Integración sencilla con .NET.
 
 ---
 
 ## 🔨 Instrucciones de ejecución
 
-### Requisitos
+### ✅ Requisitos
 
-- .NET 8 SDK
+- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download)
 - OpenCvSharp4.Windows
-- RabbitMQ (opcional para pruebas distribuidas)
+- RabbitMQ *(opcional)*
 
-### Ejecución (Modo Local)
+### ▶️ Ejecución local
 
 1. Clonar el repositorio:
    ```bash
@@ -103,38 +105,47 @@ Para ambientes distribuidos, se recomienda usar **RabbitMQ** por las siguientes 
    cd Sumato-id
    ```
 
-2.1 Ejecutar consola camera:
+2. Ejecutar consola (modo cámara):
    ```bash
-   cd Challange 1
+   cd Challange1
    dotnet run
    ```
 
-2.2 Ejecutar consola video file:
+3. Ejecutar consola (modo archivo de video):
    ```bash
-   cd Challange 1
-   dotnet run {VideoPath}
+   dotnet run {ruta_al_video}
    ```
 
-3. Ejecutar WinForms:
+4. Ejecutar WinForms:
    ```bash
    cd SumatoVisionViewer
    dotnet run
    ```
 
-4. Ejecutar servicios distribuidos (opcional):
-   Ejecutar los proyectos `QueueService`, `CaptureService`,  y `ProcessingService` en ventanas separadas .
+5. Ejecutar servicios distribuidos:
+   Ejecutar `CaptureService`, `QueueService` y `ProcessingService` en consolas separadas, ejecutando primero `QueueService` para evitar errores.
 
 ---
 
-## 🧠 Diseño Extensible
+## 🧠 Diseño extensible
 
-- Uso de interfaces (`IFrame`) para soportar nuevos tipos de frame.
-- Uso de interfaces(`IFrameSource`) para soportar nuevos tipos frame producer.
-- Diseño desacoplado y basado en componentes.
-- Preparado para integración con herramientas de análisis de video.
+- `IFrame` para nuevos formatos de imagen.
+- `IFrameSource` para nuevas fuentes de entrada.
+- Componentes desacoplados y testeables.
+- Preparado para análisis de video futuro.
+
+---
+
+## ⚠️ Mejoras posibles
+
+- Manejo de reconexión automática de WebSockets ante caídas de red.
+- Agregado de logs estructurados con Serilog o similar.
+- Reintentos automáticos de envío ante fallos transitorios.
+- Persistencia temporal de frames en caso de desconexión.
+- Implementar comunicación bidireccional real en los servicios.
 
 ---
 
 ## 📫 Contacto
 
-Desarrollado por [Antonio Forns] (https://github.com/tonyforns)  
+Desarrollado por [Antonio Forns](https://github.com/tonyforns)
